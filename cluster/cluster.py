@@ -36,7 +36,7 @@ def find_optimal_k(df, features):
         kmeans.fit(df[features])
         inertia.append(kmeans.inertia_)
 
-    # 绘制肘部法则图
+    # 绘制肘部图
     plt.plot(k_range, inertia, marker='o')
     plt.title('elbow-method fig')
     plt.xlabel('number of clusters')
@@ -54,7 +54,6 @@ def find_optimal_k(df, features):
         if d > max_dist:
             max_dist = d
             optimal_k = k
-
     print(f"best k: {optimal_k}")
     return optimal_k
 
@@ -63,7 +62,6 @@ def find_optimal_k(df, features):
 def perform_clustering(df, features, n_clusters=3):
     kmeans = KMeans(n_clusters=n_clusters, random_state=42)
     df['Cluster'] = kmeans.fit_predict(df[features])
-    print(kmeans.labels_)
     return df, kmeans
 
 
@@ -129,11 +127,11 @@ def main():
 
     # 读取数据
     df = load_data(file_path)
-    print(df.head())  # 打印数据前几行，确保数据读取正确
+    print('数据读取完成...')
 
     # 归一化特征
     df = normalize_features(df, features_to_normalize)
-    print(df.head())
+    print('数据归一化完成...')
 
     # 使用肘部法则选择合适的簇数
     optimal_k = find_optimal_k(df, features_to_normalize)
