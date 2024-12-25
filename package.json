@@ -1,0 +1,15 @@
+{
+    "dependencies": {
+        "babel-cli": "^6.26.0",
+        "chartjs-node-canvas": "^4.1.6",
+        "danfojs-node": "^1.1.2",
+        "fs": "^0.0.1-security",
+        "lay-excel": "^1.8.3",
+        "ml-kmeans": "^6.0.0",
+        "nodeplotlib": "^1.1.2",
+        "pandas-js": "^0.2.4",
+        "path": "^0.12.7",
+        "sklearn": "^1.0.0",
+        "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+    }
+}
