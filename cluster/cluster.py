@@ -6,6 +6,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
+# p到直线 ax + by + c = 0的距离
+def dist(p, a, b, c):
+    return abs(a * p[0] + b * p[1] + c) / (a * a + b * b)
+
+
 # 读取清洗过的数据
 def load_data(file_path):
     df = pd.read_csv(file_path, sep='\t', usecols=range(1, len(pd.read_csv(file_path, sep='\t', nrows=1).columns)))
@@ -14,7 +19,7 @@ def load_data(file_path):
 
 # 使用Normalization方法对数据进行归一化
 def normalize_features(df, features):
-    scaler = Normalizer() # 剩下三个归一化处理后都是L型的数据。。
+    scaler = Normalizer()  # 剩下三个归一化处理后都是L型的数据。。
     df = df.dropna(subset=features)  # 去掉这些包含NaN的行
     df[features] = scaler.fit_transform(df[features])
     return df
@@ -23,7 +28,9 @@ def normalize_features(df, features):
 # 使用肘部法则（Elbow Method）确定聚类数
 def find_optimal_k(df, features):
     inertia = []
-    k_range = range(2, 16)  # 测试从 2 到 10 个簇
+    l = 2
+    r = 17
+    k_range = range(l, r)  # 测试从 2 到 16 个簇
     for k in k_range:
         kmeans = KMeans(n_clusters=k, random_state=42, n_init=10, max_iter=100)
         kmeans.fit(df[features])
@@ -35,10 +42,19 @@ def find_optimal_k(df, features):
     plt.xlabel('number of clusters')
     plt.ylabel('inertia of clusters')
     plt.savefig("elbow.png", format='png', bbox_inches='tight')
-    # 返回肘部法则最佳 K 值
-    print(np.argmin(np.diff(inertia)))
+    # 选取到过两端点的直线的距离最大的点作为肘部
+    optimal_k = -1
+    max_dist = -1
+    a = inertia[r - l - 1] - inertia[0]
+    b = l - r + 1
+    c = 2 * (inertia[0] - inertia[r - l - 1]) + inertia[0] * (r - l - 1)
+    for k in range(l, r):
+        p = [k, inertia[k - l]]
+        d = dist(p, a, b, c)
+        if d > max_dist:
+            max_dist = d
+            optimal_k = k
 
-    optimal_k = k_range[np.argmin(np.diff(inertia)) + 1]  # 找到最佳的 K 值
     print(f"best k: {optimal_k}")
     return optimal_k
 
@@ -55,7 +71,7 @@ def perform_clustering(df, features, n_clusters=3):
 def plot_cluster_scatter(df, save_path=None):
     plt.figure(figsize=(10, 6))
     sns.scatterplot(data=df, x='IncomingCalls', y='OutgoingCalls', hue='Cluster', palette='viridis', s=100)
-    plt.title('scater plot based on outgoingCalls and incomingCalls', fontsize=16)
+    plt.title('scatter plot based on outgoingCalls and incomingCalls', fontsize=16)
     plt.xlabel('Incoming Calls', fontsize=14)
     plt.ylabel('Outgoing Calls', fontsize=14)
     plt.legend(title='scatter', fontsize=12)
